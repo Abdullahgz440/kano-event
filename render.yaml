@@ -1,21 +1,16 @@
-# Render Blueprint for Kano Event (Next.js + Prisma + PostgreSQL)
+# Render Blueprint for Kano Event (Next.js + Prisma)
+# No database section - uses existing free-tier DB via env var
 services:
   - type: web
     name: kano-event
     runtime: node
     plan: free
     buildCommand: npm install && npx prisma generate && npm run build
-    startCommand: npx prisma migrate deploy && npm start
+    startCommand: npm start
     envVars:
       - key: DATABASE_URL
-        fromDatabase:
-          name: kano-event-db
-          property: connectionString
+        sync: false
       - key: NEXTAUTH_SECRET
         generateValue: true
       - key: NODE_ENV
         value: production
-
-databases:
-  - name: kano-event-db
-    plan: free
