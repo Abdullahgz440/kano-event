@@ -1,0 +1,149 @@
+// Prisma schema for Kano Event
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  customer
+  operator
+  admin
+}
+
+enum AvailabilityStatus {
+  available
+  booked
+  reserved
+  blocked
+}
+
+enum BookingStatus {
+  pending
+  confirmed
+  cancelled
+  completed
+}
+
+model User {
+  id            Int       @id @default(autoincrement())
+  email         String    @unique
+  passwordHash  String
+  fullName      String
+  phoneNumber   String?
+  role          UserRole  @default(customer)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  venues        Venue[]   @relation("OperatorVenues")
+  bookings      Booking[]
+  reviews       Review[]
+}
+
+model Venue {
+  id              Int       @id @default(autoincrement())
+  operatorId      Int
+  operator        User      @relation("OperatorVenues", fields: [operatorId], references: [id])
+  name            String
+  slug            String    @unique
+  description     String?
+  address         String
+  lga             String
+  latitude        Decimal?
+  longitude       Decimal?
+  phoneContact    String?
+  whatsappContact String?
+  emailContact    String?
+  websiteUrl      String?
+  seatingCapacity Int
+  parkingCapacity Int?
+  hallSizeSqm     Int?
+  isIndoor        Boolean   @default(true)
+  hasGenerator    Boolean   @default(false)
+  hasAc           Boolean   @default(false)
+  hasSecurity     Boolean   @default(true)
+  hasAccessibility Boolean  @default(false)
+  isVerified      Boolean   @default(false)
+  isActive        Boolean   @default(true)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  amenities       VenueAmenity[]
+  media           VenueMedia[]
+  pricing         VenuePricing[]
+  availability    VenueAvailability[]
+  bookings        Booking[]
+  reviews         Review[]
+}
+
+model Amenity {
+  id     Int            @id @default(autoincrement())
+  name   String         @unique
+  venues VenueAmenity[]
+}
+
+model VenueAmenity {
+  venueId   Int
+  amenityId Int
+  venue     Venue   @relation(fields: [venueId], references: [id])
+  amenity   Amenity @relation(fields: [amenityId], references: [id])
+  @@id([venueId, amenityId])
+}
+
+model VenueMedia {
+  id        Int      @id @default(autoincrement())
+  venueId   Int
+  venue     Venue    @relation(fields: [venueId], references: [id])
+  url       String
+  mediaType String   @default("image")
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+}
+
+model VenuePricing {
+  id          Int      @id @default(autoincrement())
+  venueId     Int
+  venue       Venue    @relation(fields: [venueId], references: [id])
+  packageName String
+  price       Decimal
+  description String?
+  createdAt   DateTime @default(now())
+}
+
+model VenueAvailability {
+  id      Int                @id @default(autoincrement())
+  venueId Int
+  venue   Venue              @relation(fields: [venueId], references: [id])
+  date    DateTime
+  status  AvailabilityStatus @default(available)
+  @@unique([venueId, date])
+}
+
+model Booking {
+  id          Int           @id @default(autoincrement())
+  customerId  Int
+  venueId     Int
+  customer    User          @relation(fields: [customerId], references: [id])
+  venue       Venue         @relation(fields: [venueId], references: [id])
+  eventDate   DateTime
+  guestCount  Int?
+  eventType   String?
+  status      BookingStatus @default(pending)
+  message     String?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+}
+
+model Review {
+  id         Int      @id @default(autoincrement())
+  customerId Int
+  venueId    Int
+  customer   User     @relation(fields: [customerId], references: [id])
+  venue      Venue    @relation(fields: [venueId], references: [id])
+  rating     Int
+  comment    String?
+  isApproved Boolean  @default(false)
+  createdAt  DateTime @default(now())
+}
