@@ -1,4 +1,4 @@
-import Hero from '@/components/Hero';
+import Hero from '../components/Hero';
 import { MapPin, Star, ShieldCheck } from 'lucide-react';
 
 const FEATURED_VENUES = [
@@ -21,24 +21,19 @@ export default function Home() {
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {FEATURED_VENUES.map((venue) => (
-            <div key={venue.id} className="group bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-300">
-              <div className="relative h-64 overflow-hidden">
-                <img src={venue.image} alt={venue.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+            <div key={venue.id} className="group bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-xl transition-all duration-300">
+              <div className="relative">
+                <img src={venue.image} alt={venue.name} className="w-full h-52 object-cover group-hover:scale-105 transition-transform duration-500" />
                 {venue.verified && (
-                  <div className="absolute top-4 left-4 bg-brand-600 text-white px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1">
-                    <ShieldCheck size={14} /> Verified
-                  </div>
+                  <span className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm text-green-700 text-xs font-bold px-2 py-1 rounded-full flex items-center gap-1">
+                    <ShieldCheck size={12} /> Verified
+                  </span>
                 )}
-                <div className="absolute bottom-4 left-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-lg text-xs font-bold text-gray-900">
-                  {venue.price} / Day
-                </div>
               </div>
-              <div className="p-6">
-                <div className="flex justify-between items-start mb-2">
-                  <h3 className="text-xl font-bold text-gray-900">{venue.name}</h3>
-                  <div className="flex items-center gap-1 text-orange-500 font-bold">
-                    <Star size={16} fill="currentColor" /> {venue.rating}
-                  </div>
+              <div className="p-5">
+                <div className="flex justify-between items-start mb-1">
+                  <h3 className="font-bold text-gray-900">{venue.name}</h3>
+                  <span className="flex items-center gap-1 text-yellow-500 text-sm font-bold"><Star size={14} fill="currentColor" />{venue.rating}</span>
                 </div>
                 <div className="flex items-center gap-4 text-gray-500 text-sm mb-4">
                   <span className="flex items-center gap-1"><MapPin size={14} /> {venue.lga}</span>
